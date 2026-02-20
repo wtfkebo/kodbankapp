@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #F8F9FA;
+  --foreground: #171717;
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+  --glass-blur: 10px;
+  --primary-button: #722F37; /* Wine Red */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.wine-btn {
+  background-color: var(--primary-button);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wine-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(114, 47, 55, 0.3);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-button);
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.2);
+}
