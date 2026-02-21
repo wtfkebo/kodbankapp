@@ -104,32 +104,19 @@ export default function Dashboard() {
 
     return (
         <main style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '1.5rem',
-            padding: '2rem',
-            position: 'relative',
-            zIndex: 1,
+            minHeight: '100vh', display: 'flex', flexDirection: 'row',
+            gap: '1.5rem', padding: '2rem', position: 'relative', zIndex: 1,
         }}>
 
             {/* ── LEFT COLUMN ── */}
-            <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '1.1rem',
-            }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.1rem' }}>
 
                 {/* Header row */}
                 <div style={{ textAlign: 'center', position: 'relative', width: '100%', maxWidth: 480 }}>
                     <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'} style={{
                         position: 'absolute', right: 0, top: 0,
                         width: 40, height: 40, borderRadius: '50%',
-                        border: '1px solid var(--divider)',
-                        background: 'var(--glass-bg)', backdropFilter: 'blur(10px)',
+                        border: '1px solid var(--divider)', background: 'var(--glass-bg)', backdropFilter: 'blur(10px)',
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '1.1rem', transition: 'all 0.2s ease',
                     }}>
@@ -139,8 +126,7 @@ export default function Dashboard() {
                         width: 56, height: 56, borderRadius: 16,
                         background: 'linear-gradient(135deg, #722F37, #9b3d47)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        margin: '0 auto 0.75rem',
-                        boxShadow: '0 8px 24px rgba(114,47,55,0.35)',
+                        margin: '0 auto 0.75rem', boxShadow: '0 8px 24px rgba(114,47,55,0.35)',
                     }}>
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
                             <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -155,8 +141,7 @@ export default function Dashboard() {
 
                 {/* Profile Card */}
                 <div className="glass" style={{
-                    width: '100%', maxWidth: 480,
-                    padding: '1rem 1.5rem',
+                    width: '100%', maxWidth: 480, padding: '1rem 1.5rem',
                     display: 'flex', alignItems: 'center', gap: '0.9rem',
                 }}>
                     <div style={{
@@ -169,100 +154,87 @@ export default function Dashboard() {
                         {profile ? profile.username[0].toUpperCase() : '?'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {profile?.username ?? '—'}
-                        </p>
-                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {profile?.email ?? 'Loading...'}
-                        </p>
+                        <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{profile?.username ?? '—'}</p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{profile?.email ?? 'Loading...'}</p>
                     </div>
-                    <div style={{
-                        padding: '0.25rem 0.75rem', borderRadius: 99,
-                        background: 'rgba(114,47,55,0.1)', border: '1px solid rgba(114,47,55,0.2)',
-                        fontSize: '0.72rem', fontWeight: 700, color: '#722F37', textTransform: 'capitalize', flexShrink: 0,
-                    }}>
+                    <div style={{ padding: '0.25rem 0.75rem', borderRadius: 99, background: 'rgba(114,47,55,0.1)', border: '1px solid rgba(114,47,55,0.2)', fontSize: '0.72rem', fontWeight: 700, color: '#722F37', textTransform: 'capitalize', flexShrink: 0 }}>
                         {profile?.role ?? '...'}
                     </div>
                 </div>
 
-                {/* ── Premium Virtual Card ── */}
-                <div style={{
-                    width: '100%', maxWidth: 480, height: 200,
-                    borderRadius: 24,
-                    background: 'linear-gradient(135deg, #722F37 0%, #9b3d47 40%, #5c2430 70%, #2d1218 100%)',
-                    boxShadow: '0 20px 60px rgba(114,47,55,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    cursor: 'default',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-6px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 32px 72px rgba(114,47,55,0.55), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(114,47,55,0.45), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
-                >
-                    {/* Shimmer sweep */}
-                    <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%)',
-                        animation: 'cardShimmer 3s ease-in-out infinite',
-                        pointerEvents: 'none',
-                    }} />
-                    {/* Decorative circles */}
-                    <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
-                    <div style={{ position: 'absolute', top: -20, right: 60, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
-                    <div style={{ position: 'absolute', bottom: -40, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+                {/* ── Abstract Art Block ── */}
+                <div style={{ width: '100%', maxWidth: 480, position: 'relative', height: 200 }}>
+                    {/* Background glow */}
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 24, background: 'linear-gradient(135deg, rgba(114,47,55,0.06) 0%, rgba(155,61,71,0.04) 100%)', backdropFilter: 'blur(8px)', border: '1px solid var(--glass-border)' }} />
 
-                    {/* Top row: logo + NFC */}
-                    <div style={{ position: 'absolute', top: 22, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 800, fontSize: '1.05rem', letterSpacing: '0.04em' }}>KODBANK</span>
-                        {/* NFC icon */}
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="rgba(255,255,255,0.15)" />
-                            <path d="M9 9c0-1.66 1.34-3 3-3v2c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1v2c-1.66 0-3-1.34-3-3V9z" fill="rgba(255,255,255,0.75)" />
-                            <path d="M13 6c1.66 0 3 1.34 3 3v6c0 1.66-1.34 3-3 3v-2c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1V6z" fill="rgba(255,255,255,0.75)" />
-                        </svg>
+                    {/* Concentric rings - left anchor */}
+                    <div style={{ position: 'absolute', left: -30, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                        {[120, 90, 64, 42].map((size, i) => (
+                            <div key={size} style={{
+                                position: 'absolute',
+                                width: size, height: size,
+                                borderRadius: '50%',
+                                border: `1.5px solid rgba(114,47,55,${0.35 - i * 0.07})`,
+                                top: '50%', left: '50%',
+                                transform: 'translate(-50%,-50%)',
+                                animation: `spinRing ${14 + i * 4}s linear infinite ${i % 2 === 0 ? '' : 'reverse'}`,
+                            }}>
+                                {/* Dot on ring */}
+                                <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 6, height: 6, borderRadius: '50%', background: `rgba(114,47,55,${0.7 - i * 0.12})`, marginTop: -3 }} />
+                            </div>
+                        ))}
+                        {/* Center orb */}
+                        <div style={{
+                            position: 'absolute', width: 28, height: 28, borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #722F37, #9b3d47)',
+                            top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+                            boxShadow: '0 0 20px rgba(114,47,55,0.5), 0 0 40px rgba(114,47,55,0.2)',
+                            animation: 'pulseOrb 2.5s ease-in-out infinite',
+                        }} />
                     </div>
 
-                    {/* Chip */}
-                    <div style={{ position: 'absolute', top: 58, left: 26 }}>
-                        <div style={{
-                            width: 42, height: 32, borderRadius: 6,
-                            background: 'linear-gradient(135deg, #d4a017 0%, #f5c842 40%, #c8860c 100%)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                            display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr',
-                            gap: 1, padding: 3,
-                        }}>
-                            {[0, 1, 2, 3].map(i => (
-                                <div key={i} style={{ background: 'rgba(180,120,0,0.4)', borderRadius: 2 }} />
+                    {/* Right-side abstract geometric */}
+                    <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {/* Three gradient bars */}
+                        {[
+                            { w: 110, label: 'Security', pct: '100%', color: '#722F37' },
+                            { w: 80, label: 'Growth', pct: '72%', color: '#9b3d47' },
+                            { w: 60, label: 'Stability', pct: '55%', color: '#c45c6b' },
+                        ].map((bar, i) => (
+                            <div key={bar.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 130, height: 6, borderRadius: 10, background: 'rgba(114,47,55,0.1)', overflow: 'hidden', flexShrink: 0 }}>
+                                    <div style={{
+                                        height: '100%', borderRadius: 10,
+                                        background: `linear-gradient(90deg, ${bar.color}, rgba(114,47,55,0.3))`,
+                                        width: bar.pct,
+                                        animation: `fillBar${i} 1.5s ease forwards`,
+                                    }} />
+                                </div>
+                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{bar.label}</span>
+                            </div>
+                        ))}
+
+                        {/* Hex grid decoration */}
+                        <div style={{ display: 'flex', gap: 6, marginTop: 8, justifyContent: 'flex-end' }}>
+                            {[0.9, 0.6, 0.4, 0.7, 0.5].map((o, i) => (
+                                <div key={i} style={{
+                                    width: 10, height: 10, borderRadius: 3,
+                                    background: `rgba(114,47,55,${o})`,
+                                    transform: 'rotate(45deg)',
+                                    animation: `diamondPulse 2s ease-in-out infinite ${i * 0.3}s`,
+                                }} />
                             ))}
                         </div>
                     </div>
 
-                    {/* Card number */}
-                    <div style={{
-                        position: 'absolute', bottom: 54, left: 26,
-                        color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem', fontWeight: 600,
-                        letterSpacing: '0.22em', fontFamily: 'monospace',
-                    }}>
-                        •••• &nbsp;•••• &nbsp;•••• &nbsp;9283
-                    </div>
-
-                    {/* Bottom row: name + expiry + network logo */}
-                    <div style={{ position: 'absolute', bottom: 20, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                        <div>
-                            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Card Holder</p>
-                            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                {profile?.username ?? 'KODBANK USER'}
-                            </p>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Expires</p>
-                            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>12/28</p>
-                        </div>
-                        {/* Two overlapping circles (Mastercard-style) */}
-                        <div style={{ display: 'flex', position: 'relative', width: 42 }}>
-                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(234,62,45,0.85)', position: 'absolute', left: 0 }} />
-                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,165,0,0.75)', position: 'absolute', left: 14 }} />
-                        </div>
+                    {/* Center label */}
+                    <div style={{ position: 'absolute', left: 130, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
+                        <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>Portfolio Health</p>
+                        <p style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, marginTop: 4 }}>Excellent</p>
+                        <p style={{ fontSize: '0.7rem', color: '#059669', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#059669' }} />
+                            All systems active
+                        </p>
                     </div>
                 </div>
 
@@ -270,29 +242,17 @@ export default function Dashboard() {
                 <div className="glass" style={{ width: '100%', maxWidth: 480, padding: '2rem 2.25rem', textAlign: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                         <div>
-                            <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                                Account Balance
-                            </p>
+                            <p style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Account Balance</p>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>● ● ● ●  9 2 8 3</p>
                         </div>
-                        {/* Lock badge */}
-                        <div style={{
-                            display: 'flex', alignItems: 'center', gap: 5,
-                            padding: '0.3rem 0.7rem', borderRadius: 99,
-                            background: 'rgba(5,150,105,0.1)', border: '1px solid rgba(5,150,105,0.2)',
-                        }}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
-                                <rect x="3" y="11" width="18" height="11" rx="2" />
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0.3rem 0.7rem', borderRadius: 99, background: 'rgba(5,150,105,0.1)', border: '1px solid rgba(5,150,105,0.2)' }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                             <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#059669' }}>Secured</span>
                         </div>
                     </div>
                     <div style={{ minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.75rem' }}>
                         {!revealed ? (
-                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.12em' }}>
-                                ₹ &nbsp;● ● ● ● ●
-                            </p>
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.12em' }}>₹ &nbsp;● ● ● ● ●</p>
                         ) : (
                             <p className="fade-in-up" style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                                 ₹ {counted.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -302,9 +262,7 @@ export default function Dashboard() {
                     <button className="wine-btn" onClick={checkBalance} disabled={loading || revealed} style={{ width: '100%', padding: '1rem', fontSize: '0.95rem' }}>
                         {loading ? (
                             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ animation: 'spin 0.8s linear infinite' }}>
-                                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                                </svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ animation: 'spin 0.8s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                                 Verifying...
                             </span>
                         ) : revealed ? '🎉 Balance Revealed!' : '👁  Reveal My Balance'}
@@ -321,19 +279,9 @@ export default function Dashboard() {
             </div>
 
             {/* ── RIGHT COLUMN: FinBot ── */}
-            <div className="glass" style={{
-                width: 370, flexShrink: 0,
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden',
-                maxHeight: 'calc(100vh - 4rem)',
-            }}>
+            <div className="glass" style={{ width: 370, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', maxHeight: 'calc(100vh - 4rem)' }}>
                 <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                    <div style={{
-                        width: 38, height: 38, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #722F37, #9b3d47)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
-                        boxShadow: '0 4px 12px rgba(114,47,55,0.3)',
-                    }}>🤖</div>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, #722F37, #9b3d47)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', boxShadow: '0 4px 12px rgba(114,47,55,0.3)' }}>🤖</div>
                     <div>
                         <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>FinBot</p>
                         <p style={{ fontSize: '0.72rem', color: '#059669', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
@@ -365,14 +313,8 @@ export default function Dashboard() {
                     ))}
                     {chatLoading && (
                         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                            <div style={{
-                                padding: '0.65rem 1rem', borderRadius: '16px 16px 16px 4px',
-                                background: 'var(--chat-bubble-bg)', border: '1px solid var(--glass-border)', backdropFilter: 'blur(10px)',
-                                display: 'flex', gap: 5, alignItems: 'center',
-                            }}>
-                                {[0, 1, 2].map(i => (
-                                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#722F37', animation: `bounce 1s ease-in-out ${i * 0.15}s infinite` }} />
-                                ))}
+                            <div style={{ padding: '0.65rem 1rem', borderRadius: '16px 16px 16px 4px', background: 'var(--chat-bubble-bg)', border: '1px solid var(--glass-border)', backdropFilter: 'blur(10px)', display: 'flex', gap: 5, alignItems: 'center' }}>
+                                {[0, 1, 2].map(i => <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#722F37', animation: `bounce 1s ease-in-out ${i * 0.15}s infinite` }} />)}
                             </div>
                         </div>
                     )}
@@ -380,32 +322,22 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{ padding: '1rem', borderTop: '1px solid var(--divider)', display: 'flex', gap: '0.6rem', flexShrink: 0, background: 'var(--chat-input-bg)' }}>
-                    <input
-                        className="input-field"
-                        value={input}
-                        onChange={e => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Ask FinBot anything..."
-                        disabled={chatLoading}
-                        style={{ flex: 1, padding: '0.7rem 0.9rem', fontSize: '0.85rem' }}
-                    />
+                    <input className="input-field" value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask FinBot anything..." disabled={chatLoading} style={{ flex: 1, padding: '0.7rem 0.9rem', fontSize: '0.85rem' }} />
                     <button className="wine-btn" onClick={sendMessage} disabled={chatLoading || !input.trim()} style={{ padding: '0.7rem 1rem', flexShrink: 0 }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                            <line x1="22" y1="2" x2="11" y2="13" />
-                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
                     </button>
                 </div>
             </div>
 
             <style>{`
-        @keyframes spin   { to { transform: rotate(360deg); } }
-        @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
-        @keyframes cardShimmer {
-          0%   { background-position: -600px 0; }
-          60%  { background-position: 600px 0; }
-          100% { background-position: 600px 0; }
-        }
+        @keyframes spin        { to { transform: rotate(360deg); } }
+        @keyframes bounce      { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+        @keyframes pulseOrb    { 0%,100% { box-shadow: 0 0 20px rgba(114,47,55,0.5), 0 0 40px rgba(114,47,55,0.2); } 50% { box-shadow: 0 0 30px rgba(114,47,55,0.7), 0 0 60px rgba(114,47,55,0.35); } }
+        @keyframes spinRing    { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+        @keyframes diamondPulse{ 0%,100% { opacity:1; transform:rotate(45deg) scale(1); } 50% { opacity:0.4; transform:rotate(45deg) scale(0.7); } }
+        @keyframes fillBar0    { from{width:0} to{width:100%} }
+        @keyframes fillBar1    { from{width:0} to{width:72%} }
+        @keyframes fillBar2    { from{width:0} to{width:55%} }
       `}</style>
         </main>
     );
