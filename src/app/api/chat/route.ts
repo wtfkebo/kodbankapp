@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         }
 
         const response = await fetch(
-            'https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.1-8B-Instruct/v1/chat/completions',
+            'https://router.huggingface.co/together/v1/chat/completions',
             {
                 method: 'POST',
                 headers: {
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    model: 'meta-llama/Llama-3.1-8B-Instruct',
+                    model: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
                     messages: [
                         {
                             role: 'system',
