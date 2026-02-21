@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 
-function useCountUp(target: number, duration = 2000, active = false) {
+// ─── Count-up hook ─────────────────────────────────────────────────────────────
+function useCountUp(target: number, duration = 700, active = false) {
     const [count, setCount] = useState(0);
     useEffect(() => {
         if (!active || target === 0) return;
@@ -20,15 +21,32 @@ function useCountUp(target: number, duration = 2000, active = false) {
     return count;
 }
 
+// ─── Types ─────────────────────────────────────────────────────────────────────
+type Message = { role: 'user' | 'assistant'; content: string };
+
+// ─── Dashboard ─────────────────────────────────────────────────────────────────
 export default function Dashboard() {
+    // Balance state
     const [balance, setBalance] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [revealed, setRevealed] = useState(false);
     const [profile, setProfile] = useState<{ username: string; email: string; role: string } | null>(null);
 
+    // Chat state
+    const [messages, setMessages] = useState<Message[]>([
+        { role: 'assistant', content: 'Hi! I\'m Kody 👋 Your Kodbank AI assistant. Ask me anything about your account, transfers, or banking in general!' }
+    ]);
+    const [input, setInput] = useState('');
+    const [chatLoading, setChatLoading] = useState(false);
+    const chatEndRef = useRef<HTMLDivElement>(null);
+
     const counted = useCountUp(balance ?? 0, 700, revealed);
 
+    // Auto-scroll chat
+    useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+    // Load profile
     useEffect(() => {
         fetch('/api/user/profile')
             .then(r => r.json())
@@ -36,176 +54,310 @@ export default function Dashboard() {
             .catch(() => { });
     }, []);
 
-    // Single quick burst — no loop
+    // Confetti
     const fireConfetti = useCallback(() => {
         confetti({ particleCount: 40, angle: 60, spread: 70, origin: { x: 0, y: 0.65 }, colors: ['#722F37', '#9b3d47', '#f5c6cb', '#fff', '#ffd700'] });
         confetti({ particleCount: 40, angle: 120, spread: 70, origin: { x: 1, y: 0.65 }, colors: ['#722F37', '#daa520', '#ffd700', '#fff', '#f5c6cb'] });
     }, []);
 
+    // Check balance
     const checkBalance = async () => {
-        setLoading(true);
-        setError('');
+        setLoading(true); setError('');
         try {
             const res = await fetch('/api/user/balance');
             const data = await res.json();
-            if (res.ok) {
-                setBalance(Number(data.balance));
-                setRevealed(true);
-                fireConfetti();
-            } else {
-                setError(data.error || 'Could not fetch balance');
-            }
-        } catch {
-            setError('Network error. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+            if (res.ok) { setBalance(Number(data.balance)); setRevealed(true); fireConfetti(); }
+            else setError(data.error || 'Could not fetch balance');
+        } catch { setError('Network error. Please try again.'); }
+        finally { setLoading(false); }
     };
 
+    // Send chat message
+    const sendMessage = async () => {
+        const text = input.trim();
+        if (!text || chatLoading) return;
+        const newMessages: Message[] = [...messages, { role: 'user', content: text }];
+        setMessages(newMessages);
+        setInput('');
+        setChatLoading(true);
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: newMessages }),
+            });
+            const data = await res.json();
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: data.reply ?? data.error ?? 'Sorry, something went wrong.',
+            }]);
+        } catch {
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }]);
+        } finally { setChatLoading(false); }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    };
+
+    // ─── Render ─────────────────────────────────────────────────────────────────
     return (
         <main style={{
             minHeight: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
+            flexDirection: 'row',
             gap: '1.5rem',
+            padding: '2rem',
             position: 'relative',
             zIndex: 1,
         }}>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '0.25rem' }}>
-                <div style={{
-                    width: 56, height: 56, borderRadius: 16,
-                    background: 'linear-gradient(135deg, #722F37, #9b3d47)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 1rem',
-                    boxShadow: '0 8px 24px rgba(114,47,55,0.35)',
-                }}>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" />
-                        <line x1="2" y1="10" x2="22" y2="10" />
-                    </svg>
-                </div>
-                <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a2e' }}>Kodbank</h1>
-                <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.25rem' }}>Your premium banking dashboard</p>
-            </div>
 
-            {/* Profile Card */}
-            <div className="glass" style={{
-                width: '100%', maxWidth: 480,
-                padding: '1.1rem 1.5rem',
-                display: 'flex', alignItems: 'center', gap: '1rem',
+            {/* ── LEFT: Existing content ── */}
+            <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '1.25rem',
             }}>
-                {/* Avatar */}
-                <div style={{
-                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, #722F37, #9b3d47)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white', fontWeight: 800, fontSize: '1rem',
-                    boxShadow: '0 4px 12px rgba(114,47,55,0.3)',
-                }}>
-                    {profile ? profile.username[0].toUpperCase() : '?'}
-                </div>
-                {/* Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1a1a2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {profile?.username ?? '—'}
-                    </p>
-                    <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {profile?.email ?? 'Loading...'}
-                    </p>
-                </div>
-                {/* Role badge */}
-                <div style={{
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: 99,
-                    background: 'rgba(114,47,55,0.1)',
-                    border: '1px solid rgba(114,47,55,0.2)',
-                    fontSize: '0.72rem', fontWeight: 700, color: '#722F37', textTransform: 'capitalize',
-                    flexShrink: 0,
-                }}>
-                    {profile?.role ?? '...'}
-                </div>
-            </div>
-
-            {/* Balance Hero Card */}
-            <div className="glass" style={{
-                width: '100%', maxWidth: 480,
-                padding: '2.5rem 2.25rem',
-                textAlign: 'center',
-            }}>
-                {/* Virtual card strip */}
-                <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    marginBottom: '1.75rem',
-                }}>
-                    <div>
-                        <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                            Account Balance
-                        </p>
-                        <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 2 }}>● ● ● ●  9 2 8 3</p>
-                    </div>
+                {/* Header */}
+                <div style={{ textAlign: 'center' }}>
                     <div style={{
-                        width: 44, height: 32, borderRadius: 6,
-                        background: 'linear-gradient(135deg, rgba(114,47,55,0.2), rgba(114,47,55,0.05))',
-                        border: '1px solid rgba(114,47,55,0.15)',
+                        width: 56, height: 56, borderRadius: 16,
+                        background: 'linear-gradient(135deg, #722F37, #9b3d47)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        margin: '0 auto 1rem',
+                        boxShadow: '0 8px 24px rgba(114,47,55,0.35)',
                     }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#722F37" strokeWidth="1.5">
-                            <rect x="7" y="10" width="4" height="4" rx="1" />
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
                             <rect x="2" y="5" width="20" height="14" rx="2" />
+                            <line x1="2" y1="10" x2="22" y2="10" />
                         </svg>
                     </div>
+                    <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a2e' }}>Kodbank</h1>
+                    <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.25rem' }}>Your premium banking dashboard</p>
                 </div>
 
-                {/* Balance display */}
-                <div style={{ minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
-                    {!revealed ? (
-                        <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#1a1a2e', letterSpacing: '0.12em' }}>
-                            ₹ &nbsp;● ● ● ● ●
+                {/* Profile Card */}
+                <div className="glass" style={{
+                    width: '100%', maxWidth: 480,
+                    padding: '1.1rem 1.5rem',
+                    display: 'flex', alignItems: 'center', gap: '1rem',
+                }}>
+                    <div style={{
+                        width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                        background: 'linear-gradient(135deg, #722F37, #9b3d47)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'white', fontWeight: 800, fontSize: '1rem',
+                        boxShadow: '0 4px 12px rgba(114,47,55,0.3)',
+                    }}>
+                        {profile ? profile.username[0].toUpperCase() : '?'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1a1a2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {profile?.username ?? '—'}
                         </p>
-                    ) : (
-                        <p className="fade-in-up" style={{ fontSize: '2.4rem', fontWeight: 800, color: '#1a1a2e' }}>
-                            ₹ {counted.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {profile?.email ?? 'Loading...'}
                         </p>
-                    )}
+                    </div>
+                    <div style={{
+                        padding: '0.25rem 0.75rem', borderRadius: 99,
+                        background: 'rgba(114,47,55,0.1)', border: '1px solid rgba(114,47,55,0.2)',
+                        fontSize: '0.72rem', fontWeight: 700, color: '#722F37', textTransform: 'capitalize', flexShrink: 0,
+                    }}>
+                        {profile?.role ?? '...'}
+                    </div>
                 </div>
 
-                <button
-                    className="wine-btn"
-                    onClick={checkBalance}
-                    disabled={loading || revealed}
-                    style={{ width: '100%', padding: '1rem', fontSize: '0.95rem' }}
-                >
-                    {loading ? (
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"
-                                style={{ animation: 'spin 0.8s linear infinite' }}>
-                                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                {/* Balance Card */}
+                <div className="glass" style={{ width: '100%', maxWidth: 480, padding: '2.5rem 2.25rem', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
+                        <div>
+                            <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                Account Balance
+                            </p>
+                            <p style={{ fontSize: '0.78rem', color: '#6b7280', marginTop: 2 }}>● ● ● ●  9 2 8 3</p>
+                        </div>
+                        <div style={{
+                            width: 44, height: 32, borderRadius: 6,
+                            background: 'linear-gradient(135deg, rgba(114,47,55,0.2), rgba(114,47,55,0.05))',
+                            border: '1px solid rgba(114,47,55,0.15)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#722F37" strokeWidth="1.5">
+                                <rect x="7" y="10" width="4" height="4" rx="1" />
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
                             </svg>
-                            Verifying with backend...
-                        </span>
-                    ) : revealed
-                        ? '🎉 Balance Revealed!'
-                        : '👁  Reveal My Balance'}
-                </button>
+                        </div>
+                    </div>
 
-                {error && (
-                    <p style={{ color: '#dc2626', fontSize: '0.82rem', marginTop: '0.75rem' }}>{error}</p>
-                )}
+                    <div style={{ minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
+                        {!revealed ? (
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#1a1a2e', letterSpacing: '0.12em' }}>
+                                ₹ &nbsp;● ● ● ● ●
+                            </p>
+                        ) : (
+                            <p className="fade-in-up" style={{ fontSize: '2.4rem', fontWeight: 800, color: '#1a1a2e' }}>
+                                ₹ {counted.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </p>
+                        )}
+                    </div>
+
+                    <button
+                        className="wine-btn"
+                        onClick={checkBalance}
+                        disabled={loading || revealed}
+                        style={{ width: '100%', padding: '1rem', fontSize: '0.95rem' }}
+                    >
+                        {loading ? (
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"
+                                    style={{ animation: 'spin 0.8s linear infinite' }}>
+                                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                                </svg>
+                                Verifying...
+                            </span>
+                        ) : revealed ? '🎉 Balance Revealed!' : '👁  Reveal My Balance'}
+                    </button>
+
+                    {error && <p style={{ color: '#dc2626', fontSize: '0.82rem', marginTop: '0.75rem' }}>{error}</p>}
+                </div>
+
+                {/* Footer */}
+                <div style={{ display: 'flex', gap: '1.5rem' }}>
+                    <a href="/login" style={{ fontSize: '0.8rem', color: '#9ca3af', textDecoration: 'none', fontWeight: 500 }}>Sign out</a>
+                    <span style={{ color: '#e5e7eb' }}>|</span>
+                    <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 500 }}>Kodbank © 2025</span>
+                </div>
             </div>
 
-            {/* Footer nav */}
-            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem' }}>
-                <a href="/login" style={{ fontSize: '0.8rem', color: '#9ca3af', textDecoration: 'none', fontWeight: 500 }}>Sign out</a>
-                <span style={{ color: '#e5e7eb' }}>|</span>
-                <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 500 }}>Kodbank © 2025</span>
+            {/* ── RIGHT: Chatbot ── */}
+            <div className="glass" style={{
+                width: 370,
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                maxHeight: 'calc(100vh - 4rem)',
+            }}>
+                {/* Chat header */}
+                <div style={{
+                    padding: '1.25rem 1.5rem',
+                    borderBottom: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0,
+                }}>
+                    <div style={{
+                        width: 38, height: 38, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #722F37, #9b3d47)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1rem',
+                        boxShadow: '0 4px 12px rgba(114,47,55,0.3)',
+                    }}>🤖</div>
+                    <div>
+                        <p style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1a1a2e' }}>Kody</p>
+                        <p style={{ fontSize: '0.72rem', color: '#059669', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#059669', display: 'inline-block' }} />
+                            AI Banking Assistant
+                        </p>
+                    </div>
+                    <div style={{ marginLeft: 'auto', fontSize: '0.7rem', color: '#9ca3af', textAlign: 'right' }}>
+                        Powered by<br />
+                        <span style={{ fontWeight: 600, color: '#722F37' }}>Llama 3.1</span>
+                    </div>
+                </div>
+
+                {/* Messages */}
+                <div style={{
+                    flex: 1, overflowY: 'auto',
+                    padding: '1rem',
+                    display: 'flex', flexDirection: 'column', gap: '0.75rem',
+                }}>
+                    {messages.map((msg, i) => (
+                        <div key={i} style={{
+                            display: 'flex',
+                            justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                        }}>
+                            <div style={{
+                                maxWidth: '82%',
+                                padding: '0.65rem 1rem',
+                                borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                                background: msg.role === 'user'
+                                    ? 'linear-gradient(135deg, #722F37, #9b3d47)'
+                                    : 'rgba(255,255,255,0.6)',
+                                color: msg.role === 'user' ? '#fff' : '#1a1a2e',
+                                fontSize: '0.85rem',
+                                lineHeight: 1.5,
+                                boxShadow: msg.role === 'user'
+                                    ? '0 4px 12px rgba(114,47,55,0.25)'
+                                    : '0 2px 8px rgba(0,0,0,0.06)',
+                                border: msg.role === 'assistant' ? '1px solid rgba(255,255,255,0.4)' : 'none',
+                                backdropFilter: 'blur(10px)',
+                                whiteSpace: 'pre-wrap',
+                            }}>
+                                {msg.content}
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Typing indicator */}
+                    {chatLoading && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                            <div style={{
+                                padding: '0.65rem 1rem', borderRadius: '16px 16px 16px 4px',
+                                background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.4)',
+                                backdropFilter: 'blur(10px)',
+                                display: 'flex', gap: 5, alignItems: 'center',
+                            }}>
+                                {[0, 1, 2].map(i => (
+                                    <span key={i} style={{
+                                        width: 7, height: 7, borderRadius: '50%', background: '#722F37',
+                                        animation: `bounce 1s ease-in-out ${i * 0.15}s infinite`,
+                                    }} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    <div ref={chatEndRef} />
+                </div>
+
+                {/* Input */}
+                <div style={{
+                    padding: '1rem',
+                    borderTop: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex', gap: '0.6rem', flexShrink: 0,
+                    background: 'rgba(255,255,255,0.15)',
+                }}>
+                    <input
+                        className="input-field"
+                        value={input}
+                        onChange={e => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Ask Kody anything..."
+                        disabled={chatLoading}
+                        style={{ flex: 1, padding: '0.7rem 0.9rem', fontSize: '0.85rem' }}
+                    />
+                    <button
+                        className="wine-btn"
+                        onClick={sendMessage}
+                        disabled={chatLoading || !input.trim()}
+                        style={{ padding: '0.7rem 1rem', flexShrink: 0 }}
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin   { to { transform: rotate(360deg); } }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50%       { transform: translateY(-5px); }
+        }
       `}</style>
         </main>
     );
