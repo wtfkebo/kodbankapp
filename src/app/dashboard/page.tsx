@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 
-// ─── Count-up hook ─────────────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 700, active = false) {
     const [count, setCount] = useState(0);
     useEffect(() => {
@@ -23,18 +22,6 @@ function useCountUp(target: number, duration = 700, active = false) {
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
-const QUICK_STATS = [
-    { icon: '📈', label: 'Income', value: '₹32,000', color: '#059669' },
-    { icon: '💳', label: 'Spent', value: '₹8,420', color: '#722F37' },
-    { icon: '🎯', label: 'Saved', value: '₹4,200', color: '#8b5cf6' },
-];
-
-const RECENT_TXN = [
-    { icon: '🛒', name: 'Groceries', amount: '-₹1,240', date: 'Today', color: '#1a1a2e' },
-    { icon: '💰', name: 'Salary Credit', amount: '+₹32,000', date: 'Yesterday', color: '#059669' },
-    { icon: '📱', name: 'Mobile Recharge', amount: '-₹199', date: '20 Feb', color: '#1a1a2e' },
-];
-
 export default function Dashboard() {
     const [balance, setBalance] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
@@ -50,7 +37,6 @@ export default function Dashboard() {
     const chatEndRef = useRef<HTMLDivElement>(null);
     const counted = useCountUp(balance ?? 0, 700, revealed);
 
-    // Dark mode persistence
     useEffect(() => {
         const saved = localStorage.getItem('kb-theme');
         if (saved === 'dark') { setDark(true); document.documentElement.setAttribute('data-theme', 'dark'); }
@@ -112,7 +98,6 @@ export default function Dashboard() {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     };
 
-    // Greeting based on time
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
     const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -135,27 +120,21 @@ export default function Dashboard() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '1rem',
+                gap: '1.1rem',
             }}>
 
-                {/* Header + theme toggle */}
+                {/* Header row */}
                 <div style={{ textAlign: 'center', position: 'relative', width: '100%', maxWidth: 480 }}>
-                    {/* Dark mode toggle */}
-                    <button onClick={toggleDark} title={dark ? 'Switch to light mode' : 'Switch to dark mode'} style={{
+                    <button onClick={toggleDark} title={dark ? 'Light mode' : 'Dark mode'} style={{
                         position: 'absolute', right: 0, top: 0,
                         width: 40, height: 40, borderRadius: '50%',
                         border: '1px solid var(--divider)',
-                        background: 'var(--glass-bg)',
-                        backdropFilter: 'blur(10px)',
-                        cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '1.1rem',
-                        transition: 'all 0.2s ease',
-                        color: 'var(--text-primary)',
+                        background: 'var(--glass-bg)', backdropFilter: 'blur(10px)',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.1rem', transition: 'all 0.2s ease',
                     }}>
                         {dark ? '☀️' : '🌙'}
                     </button>
-
                     <div style={{
                         width: 56, height: 56, borderRadius: 16,
                         background: 'linear-gradient(135deg, #722F37, #9b3d47)',
@@ -206,15 +185,85 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Quick Stats Row */}
-                <div style={{ display: 'flex', gap: '0.75rem', width: '100%', maxWidth: 480 }}>
-                    {QUICK_STATS.map(s => (
-                        <div key={s.label} className="glass" style={{ flex: 1, padding: '0.85rem 1rem', textAlign: 'center' }}>
-                            <span style={{ fontSize: '1.2rem' }}>{s.icon}</span>
-                            <p style={{ fontSize: '0.88rem', fontWeight: 800, color: s.color, marginTop: '0.3rem' }}>{s.value}</p>
-                            <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{s.label}</p>
+                {/* ── Premium Virtual Card ── */}
+                <div style={{
+                    width: '100%', maxWidth: 480, height: 200,
+                    borderRadius: 24,
+                    background: 'linear-gradient(135deg, #722F37 0%, #9b3d47 40%, #5c2430 70%, #2d1218 100%)',
+                    boxShadow: '0 20px 60px rgba(114,47,55,0.45), inset 0 1px 0 rgba(255,255,255,0.15)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    cursor: 'default',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-6px)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 32px 72px rgba(114,47,55,0.55), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(114,47,55,0.45), inset 0 1px 0 rgba(255,255,255,0.15)'; }}
+                >
+                    {/* Shimmer sweep */}
+                    <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%)',
+                        animation: 'cardShimmer 3s ease-in-out infinite',
+                        pointerEvents: 'none',
+                    }} />
+                    {/* Decorative circles */}
+                    <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                    <div style={{ position: 'absolute', top: -20, right: 60, width: 140, height: 140, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+                    <div style={{ position: 'absolute', bottom: -40, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }} />
+
+                    {/* Top row: logo + NFC */}
+                    <div style={{ position: 'absolute', top: 22, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 800, fontSize: '1.05rem', letterSpacing: '0.04em' }}>KODBANK</span>
+                        {/* NFC icon */}
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="rgba(255,255,255,0.15)" />
+                            <path d="M9 9c0-1.66 1.34-3 3-3v2c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1v2c-1.66 0-3-1.34-3-3V9z" fill="rgba(255,255,255,0.75)" />
+                            <path d="M13 6c1.66 0 3 1.34 3 3v6c0 1.66-1.34 3-3 3v-2c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1V6z" fill="rgba(255,255,255,0.75)" />
+                        </svg>
+                    </div>
+
+                    {/* Chip */}
+                    <div style={{ position: 'absolute', top: 58, left: 26 }}>
+                        <div style={{
+                            width: 42, height: 32, borderRadius: 6,
+                            background: 'linear-gradient(135deg, #d4a017 0%, #f5c842 40%, #c8860c 100%)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                            display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr',
+                            gap: 1, padding: 3,
+                        }}>
+                            {[0, 1, 2, 3].map(i => (
+                                <div key={i} style={{ background: 'rgba(180,120,0,0.4)', borderRadius: 2 }} />
+                            ))}
                         </div>
-                    ))}
+                    </div>
+
+                    {/* Card number */}
+                    <div style={{
+                        position: 'absolute', bottom: 54, left: 26,
+                        color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem', fontWeight: 600,
+                        letterSpacing: '0.22em', fontFamily: 'monospace',
+                    }}>
+                        •••• &nbsp;•••• &nbsp;•••• &nbsp;9283
+                    </div>
+
+                    {/* Bottom row: name + expiry + network logo */}
+                    <div style={{ position: 'absolute', bottom: 20, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Card Holder</p>
+                            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                {profile?.username ?? 'KODBANK USER'}
+                            </p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Expires</p>
+                            <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>12/28</p>
+                        </div>
+                        {/* Two overlapping circles (Mastercard-style) */}
+                        <div style={{ display: 'flex', position: 'relative', width: 42 }}>
+                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(234,62,45,0.85)', position: 'absolute', left: 0 }} />
+                            <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,165,0,0.75)', position: 'absolute', left: 14 }} />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Balance Card */}
@@ -226,15 +275,17 @@ export default function Dashboard() {
                             </p>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>● ● ● ●  9 2 8 3</p>
                         </div>
+                        {/* Lock badge */}
                         <div style={{
-                            width: 44, height: 32, borderRadius: 6,
-                            background: 'rgba(114,47,55,0.1)', border: '1px solid rgba(114,47,55,0.15)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            padding: '0.3rem 0.7rem', borderRadius: 99,
+                            background: 'rgba(5,150,105,0.1)', border: '1px solid rgba(5,150,105,0.2)',
                         }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#722F37" strokeWidth="1.5">
-                                <rect x="7" y="10" width="4" height="4" rx="1" />
-                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                             </svg>
+                            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#059669' }}>Secured</span>
                         </div>
                     </div>
                     <div style={{ minHeight: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.75rem' }}>
@@ -261,32 +312,6 @@ export default function Dashboard() {
                     {error && <p style={{ color: '#dc2626', fontSize: '0.82rem', marginTop: '0.75rem' }}>{error}</p>}
                 </div>
 
-                {/* Recent Transactions mini-card */}
-                <div className="glass" style={{ width: '100%', maxWidth: 480, padding: '1.1rem 1.5rem' }}>
-                    <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.85rem' }}>
-                        Recent Activity
-                    </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-                        {RECENT_TXN.map((t, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <div style={{
-                                    width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                                    background: 'var(--wine-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
-                                }}>
-                                    {t.icon}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <p style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t.name}</p>
-                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t.date}</p>
-                                </div>
-                                <p style={{ fontSize: '0.88rem', fontWeight: 700, color: t.amount.startsWith('+') ? '#059669' : 'var(--text-primary)', flexShrink: 0 }}>
-                                    {t.amount}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
                 {/* Footer */}
                 <div style={{ display: 'flex', gap: '1.5rem' }}>
                     <a href="/login" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 500 }}>Sign out</a>
@@ -302,12 +327,7 @@ export default function Dashboard() {
                 overflow: 'hidden',
                 maxHeight: 'calc(100vh - 4rem)',
             }}>
-                {/* Chat header */}
-                <div style={{
-                    padding: '1.25rem 1.5rem',
-                    borderBottom: '1px solid var(--divider)',
-                    display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0,
-                }}>
+                <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                     <div style={{
                         width: 38, height: 38, borderRadius: '50%',
                         background: 'linear-gradient(135deg, #722F37, #9b3d47)',
@@ -326,27 +346,18 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Messages */}
-                <div style={{
-                    flex: 1, overflowY: 'auto',
-                    padding: '1rem',
-                    display: 'flex', flexDirection: 'column', gap: '0.75rem',
-                }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {messages.map((msg, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                             <div style={{
-                                maxWidth: '82%',
-                                padding: '0.65rem 1rem',
+                                maxWidth: '82%', padding: '0.65rem 1rem',
                                 borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                                background: msg.role === 'user'
-                                    ? 'linear-gradient(135deg, #722F37, #9b3d47)'
-                                    : 'var(--chat-bubble-bg)',
+                                background: msg.role === 'user' ? 'linear-gradient(135deg, #722F37, #9b3d47)' : 'var(--chat-bubble-bg)',
                                 color: msg.role === 'user' ? '#fff' : 'var(--text-primary)',
                                 fontSize: '0.85rem', lineHeight: 1.5,
                                 boxShadow: msg.role === 'user' ? '0 4px 12px rgba(114,47,55,0.25)' : '0 2px 8px rgba(0,0,0,0.06)',
                                 border: msg.role === 'assistant' ? '1px solid var(--glass-border)' : 'none',
-                                backdropFilter: 'blur(10px)',
-                                whiteSpace: 'pre-wrap',
+                                backdropFilter: 'blur(10px)', whiteSpace: 'pre-wrap',
                             }}>
                                 {msg.content}
                             </div>
@@ -356,15 +367,11 @@ export default function Dashboard() {
                         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                             <div style={{
                                 padding: '0.65rem 1rem', borderRadius: '16px 16px 16px 4px',
-                                background: 'var(--chat-bubble-bg)', border: '1px solid var(--glass-border)',
-                                backdropFilter: 'blur(10px)',
+                                background: 'var(--chat-bubble-bg)', border: '1px solid var(--glass-border)', backdropFilter: 'blur(10px)',
                                 display: 'flex', gap: 5, alignItems: 'center',
                             }}>
                                 {[0, 1, 2].map(i => (
-                                    <span key={i} style={{
-                                        width: 7, height: 7, borderRadius: '50%', background: '#722F37',
-                                        animation: `bounce 1s ease-in-out ${i * 0.15}s infinite`,
-                                    }} />
+                                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#722F37', animation: `bounce 1s ease-in-out ${i * 0.15}s infinite` }} />
                                 ))}
                             </div>
                         </div>
@@ -372,13 +379,7 @@ export default function Dashboard() {
                     <div ref={chatEndRef} />
                 </div>
 
-                {/* Input */}
-                <div style={{
-                    padding: '1rem',
-                    borderTop: '1px solid var(--divider)',
-                    display: 'flex', gap: '0.6rem', flexShrink: 0,
-                    background: 'var(--chat-input-bg)',
-                }}>
+                <div style={{ padding: '1rem', borderTop: '1px solid var(--divider)', display: 'flex', gap: '0.6rem', flexShrink: 0, background: 'var(--chat-input-bg)' }}>
                     <input
                         className="input-field"
                         value={input}
@@ -399,9 +400,11 @@ export default function Dashboard() {
 
             <style>{`
         @keyframes spin   { to { transform: rotate(360deg); } }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50%       { transform: translateY(-5px); }
+        @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+        @keyframes cardShimmer {
+          0%   { background-position: -600px 0; }
+          60%  { background-position: 600px 0; }
+          100% { background-position: 600px 0; }
         }
       `}</style>
         </main>
