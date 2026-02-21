@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         }
 
         const response = await fetch(
-            'https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct/v1/chat/completions',
+            'https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.1-8B-Instruct/v1/chat/completions',
             {
                 method: 'POST',
                 headers: {
@@ -34,9 +34,11 @@ export async function POST(req: Request) {
         );
 
         if (!response.ok) {
-            const err = await response.text();
-            console.error('HuggingFace API error:', err);
-            return NextResponse.json({ error: 'AI service unavailable. Please try again.' }, { status: 502 });
+            const errText = await response.text();
+            let errMsg = 'AI service unavailable. Please try again.';
+            try { errMsg = JSON.parse(errText)?.error ?? errMsg; } catch { }
+            console.error('HuggingFace API error:', response.status, errText);
+            return NextResponse.json({ error: errMsg }, { status: 502 });
         }
 
         const data = await response.json();
