@@ -162,82 +162,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* ── Abstract Art Block ── */}
-                <div style={{ width: '100%', maxWidth: 480, position: 'relative', height: 200 }}>
-                    {/* Background glow */}
-                    <div style={{ position: 'absolute', inset: 0, borderRadius: 24, background: 'linear-gradient(135deg, rgba(114,47,55,0.06) 0%, rgba(155,61,71,0.04) 100%)', backdropFilter: 'blur(8px)', border: '1px solid var(--glass-border)' }} />
-
-                    {/* Concentric rings - left anchor */}
-                    <div style={{ position: 'absolute', left: -30, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-                        {[120, 90, 64, 42].map((size, i) => (
-                            <div key={size} style={{
-                                position: 'absolute',
-                                width: size, height: size,
-                                borderRadius: '50%',
-                                border: `1.5px solid rgba(114,47,55,${0.35 - i * 0.07})`,
-                                top: '50%', left: '50%',
-                                transform: 'translate(-50%,-50%)',
-                                animation: `spinRing ${14 + i * 4}s linear infinite ${i % 2 === 0 ? '' : 'reverse'}`,
-                            }}>
-                                {/* Dot on ring */}
-                                <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 6, height: 6, borderRadius: '50%', background: `rgba(114,47,55,${0.7 - i * 0.12})`, marginTop: -3 }} />
-                            </div>
-                        ))}
-                        {/* Center orb */}
-                        <div style={{
-                            position: 'absolute', width: 28, height: 28, borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #722F37, #9b3d47)',
-                            top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-                            boxShadow: '0 0 20px rgba(114,47,55,0.5), 0 0 40px rgba(114,47,55,0.2)',
-                            animation: 'pulseOrb 2.5s ease-in-out infinite',
-                        }} />
-                    </div>
-
-                    {/* Right-side abstract geometric */}
-                    <div style={{ position: 'absolute', right: 28, top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {/* Three gradient bars */}
-                        {[
-                            { w: 110, label: 'Security', pct: '100%', color: '#722F37' },
-                            { w: 80, label: 'Growth', pct: '72%', color: '#9b3d47' },
-                            { w: 60, label: 'Stability', pct: '55%', color: '#c45c6b' },
-                        ].map((bar, i) => (
-                            <div key={bar.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{ width: 130, height: 6, borderRadius: 10, background: 'rgba(114,47,55,0.1)', overflow: 'hidden', flexShrink: 0 }}>
-                                    <div style={{
-                                        height: '100%', borderRadius: 10,
-                                        background: `linear-gradient(90deg, ${bar.color}, rgba(114,47,55,0.3))`,
-                                        width: bar.pct,
-                                        animation: `fillBar${i} 1.5s ease forwards`,
-                                    }} />
-                                </div>
-                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{bar.label}</span>
-                            </div>
-                        ))}
-
-                        {/* Hex grid decoration */}
-                        <div style={{ display: 'flex', gap: 6, marginTop: 8, justifyContent: 'flex-end' }}>
-                            {[0.9, 0.6, 0.4, 0.7, 0.5].map((o, i) => (
-                                <div key={i} style={{
-                                    width: 10, height: 10, borderRadius: 3,
-                                    background: `rgba(114,47,55,${o})`,
-                                    transform: 'rotate(45deg)',
-                                    animation: `diamondPulse 2s ease-in-out infinite ${i * 0.3}s`,
-                                }} />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Center label */}
-                    <div style={{ position: 'absolute', left: 130, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
-                        <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>Portfolio Health</p>
-                        <p style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, marginTop: 4 }}>Excellent</p>
-                        <p style={{ fontSize: '0.7rem', color: '#059669', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#059669' }} />
-                            All systems active
-                        </p>
-                    </div>
-                </div>
-
                 {/* Balance Card */}
                 <div className="glass" style={{ width: '100%', maxWidth: 480, padding: '2rem 2.25rem', textAlign: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
@@ -330,14 +254,8 @@ export default function Dashboard() {
             </div>
 
             <style>{`
-        @keyframes spin        { to { transform: rotate(360deg); } }
-        @keyframes bounce      { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
-        @keyframes pulseOrb    { 0%,100% { box-shadow: 0 0 20px rgba(114,47,55,0.5), 0 0 40px rgba(114,47,55,0.2); } 50% { box-shadow: 0 0 30px rgba(114,47,55,0.7), 0 0 60px rgba(114,47,55,0.35); } }
-        @keyframes spinRing    { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
-        @keyframes diamondPulse{ 0%,100% { opacity:1; transform:rotate(45deg) scale(1); } 50% { opacity:0.4; transform:rotate(45deg) scale(0.7); } }
-        @keyframes fillBar0    { from{width:0} to{width:100%} }
-        @keyframes fillBar1    { from{width:0} to{width:72%} }
-        @keyframes fillBar2    { from{width:0} to{width:55%} }
+        @keyframes spin   { to { transform: rotate(360deg); } }
+        @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
       `}</style>
         </main>
     );
